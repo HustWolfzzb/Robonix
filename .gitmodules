@@ -4,3 +4,9 @@
 [submodule "driver/orbbec/src/OrbbecSDK_ROS2"]
 	path = driver/orbbec/src/OrbbecSDK_ROS2
 	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
+[submodule "capability/grasp_detection/src/graspnetAPI"]
+	path = capability/grasp_detection/src/graspnetAPI
+	url = https://github.com/graspnet/graspnetAPI.git
+[submodule "capability/grasp_detection/src/graspnet_baseline"]
+	path = capability/grasp_detection/src/graspnet_baseline
+	url = https://github.com/graspnet/graspnet-baseline.git

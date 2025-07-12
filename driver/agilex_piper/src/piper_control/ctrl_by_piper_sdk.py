@@ -13,16 +13,14 @@ from scipy.spatial.transform import Rotation as R
 class CtrlByPiperSDK(CtrlBase):
     FACTOR = 1000.0
 
-    def __init__(
-        self,
-        move_mode_end_pose: bool = False,
-    ):
+    def __init__(self, move_mode_end_pose: bool = False, debug_mode=True):
         """
         move_mode: int
         0: 末端位姿控制
         1: 关节角度控制
         """
         super().__init__()
+        self.debug_mode = debug_mode
         self.move_mode_end_pose = move_mode_end_pose
         self.actuator_ids = [i for i in range(self.joint_num)]
         # 统一是弧度
@@ -42,8 +40,11 @@ class CtrlByPiperSDK(CtrlBase):
         """
         确保在对象销毁时复原并禁用机械臂
         """
-        self.reset(move_mode_end_pose=False)
         print("Resetting Piper arm to initial state.")
+        try:
+            self.reset(move_mode_end_pose=False)
+        except TimeoutError as e:
+            print(f"Error during reset: {e}")
         # time.sleep(2)
         self.disable()
 
@@ -66,6 +67,10 @@ class CtrlByPiperSDK(CtrlBase):
         else:
             self.move_mode_end_pose = move_mode_end_pose
         if move_mode_end_pose:
+            # self.set_ee_pose(
+            #     position=[0.3, 0.2, 0.2],
+            #     euler_angles=[0.0, 170.0, 0.0],
+            # )
             self.set_move_mode(move_mode_end_pose=True, timeout=timeout)
 
     def send_a_step(self):
@@ -153,6 +158,15 @@ class CtrlByPiperSDK(CtrlBase):
             / self.FACTOR,
             degrees=True,
         ).as_quat()
+
+    def get_ee_euler(self) -> np.ndarray:
+        end_pose = self.piper.GetArmEndPoseMsgs().end_pose
+        return (
+            np.array(
+                [end_pose.RX_axis, end_pose.RY_axis, end_pose.RZ_axis], dtype=np.float32
+            )
+            / self.FACTOR
+        )
 
     def set_ee_pose(
         self, position: list[float], euler_angles: list[float], timeout: int = 5
@@ -253,7 +267,7 @@ class CtrlByPiperSDK(CtrlBase):
         self.piper.MotionCtrl_2(
             ctrl_mode=0x01,
             move_mode=0x0 if move_mode_end_pose else 0x01,
-            move_spd_rate_ctrl=100,
+            move_spd_rate_ctrl=10 if self.debug_mode else 100,
             is_mit_mode=0x00,
         )
         while True:
@@ -297,12 +311,13 @@ if __name__ == "__main__":
     piper_ctrl.reset(move_mode_end_pose=True)
     piper_ctrl.set_ee_pose(
         position=[0.3, 0.2, 0.2],
-        euler_angles=[0.0, 170.0, 0.0],
+        euler_angles=[0.0, 90.0, 0.0],
     )
     print("Set end-effector pose.")
     time.sleep(1)
     print(piper_ctrl.piper.GetArmStatus().arm_status)
     print("Updated end-effector position:", piper_ctrl.get_ee_pos())
+    print("Updated end-effector orientation (euler):", piper_ctrl.get_ee_euler())
     print("Updated end-effector orientation (quaternion):", piper_ctrl.get_ee_quat())
 
     # 这两句不sleep好像到不了
