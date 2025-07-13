@@ -184,3 +184,4 @@ if __name__ == "__main__":
     package_init("config/include.yaml")
     registry = FunctionRegistry()
     print(f"[eaios] Finalized with {registry.gen_lens()} functions registered.")
+    mcp.run(transport='stdio')
