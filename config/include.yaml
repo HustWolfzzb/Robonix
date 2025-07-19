@@ -12,6 +12,7 @@ capability:
   - activator
 skill:
   - moveit
+  - test_skill
 brain:
   - test_brian
 
