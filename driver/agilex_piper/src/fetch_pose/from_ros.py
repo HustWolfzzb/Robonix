@@ -14,7 +14,7 @@ class FetchPoseFromROS(Node):
         # TODO: 可能要从tf获取转换后的目标位姿
         self.target_pose_sub = self.create_subscription(
             PoseStamped,
-            "/piper_pose_detection/pose_stamped",
+            "/piper_base_link/pose_stamped",
             self.target_pose_callback,
             10,
         )
@@ -45,7 +45,7 @@ class FetchPoseFromROS(Node):
             ]
         ).as_euler("zyx", degrees=True)
         with self.lock:
-            self.callback(self.target_position, self.target_euler)
+            self.callback(self.target_position, self.target_euler, msg.header.stamp)
 
     def get_pose(self):
         """

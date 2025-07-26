@@ -198,28 +198,28 @@ class Detection:
 
     @staticmethod
     def draw_grasps(gg: GraspGroup, cloud, path: str, size: np.ndarray):
-        gg.add(
-            Grasp(
-                1,
-                0.06,
-                0.02,
-                0.02,
-                np.array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
-                [0, 0, 1],
-                -1,
-            )
-        )
-        gg.add(
-            Grasp(
-                0.1,
-                0.06,
-                0.02,
-                0.02,
-                gg.rotation_matrices[0],
-                [0, 0, 0.5],
-                -1,
-            )
-        )
+        # gg.add(
+        #     Grasp(
+        #         1,
+        #         0.06,
+        #         0.02,
+        #         0.02,
+        #         np.array([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+        #         [0, 0, 1],
+        #         -1,
+        #     )
+        # )
+        # gg.add(
+        #     Grasp(
+        #         0.1,
+        #         0.06,
+        #         0.02,
+        #         0.02,
+        #         gg.rotation_matrices[0],
+        #         [0, 0, 0.5],
+        #         -1,
+        #     )
+        # )
         grippers = gg.to_open3d_geometry_list()
         # o3d.visualization.draw_geometries([cloud, *grippers])
 

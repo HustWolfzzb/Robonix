@@ -49,6 +49,8 @@ class CtrlByPiperSDK(CtrlBase):
         self.disable()
 
     def reset(self, move_mode_end_pose: bool = None, timeout: int = 5):
+        if self.debug_mode:
+            timeout *= 2
         self.piper.JointConfig(clear_err=0xAE)
         self.piper.CrashProtectionConfig(0, 0, 0, 0, 0, 0)
         self.set_move_mode(move_mode_end_pose=False, timeout=timeout)
@@ -193,7 +195,11 @@ class CtrlByPiperSDK(CtrlBase):
 
         start = time.time()
         while True:
-            if self.piper.GetArmStatus().arm_status.motion_status == 0x00:
+            status = self.piper.GetArmStatus().arm_status
+            if status.arm_status != 0x0:
+                print(self.arm_status2str(status.arm_status))
+                break
+            if status.motion_status == 0x00:
                 print("End-effector pose set successfully.")
                 break
             if time.time() - start > timeout:
@@ -282,6 +288,28 @@ class CtrlByPiperSDK(CtrlBase):
                 raise TimeoutError(
                     "Failed to switch move mode within the specified timeout."
                 )
+
+    @staticmethod
+    def arm_status2str(status):
+        status_dict = {
+            0x00: "正常",
+            0x01: "急停",
+            0x02: "无解",
+            0x03: "奇异点",
+            0x04: "目标角度超过限",
+            0x05: "关节通信异常",
+            0x06: "关节抱闸未打开",
+            0x07: "机械臂发生碰撞",
+            0x08: "拖动示教时超速",
+            0x09: "关节状态异常",
+            0x0A: "其它异常",
+            0x0B: "示教记录",
+            0x0C: "示教执行",
+            0x0D: "示教暂停",
+            0x0E: "主控NTC过温",
+            0x0F: "释放电阻NTC过温",
+        }
+        return status_dict.get(status, "未知状态: " + hex(status))
 
 
 if __name__ == "__main__":

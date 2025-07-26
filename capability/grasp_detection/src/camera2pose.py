@@ -38,7 +38,7 @@ class PiperPoseDetection(Node):
             PoseStamped, "/piper_pose_detection/pose_stamped", 10
         )
 
-        self.img_path = "images/"
+        self.img_path = os.path.join(os.path.dirname(__file__), "images/")
         self.depth_threshold = 0.5 * 1000  # m
 
         self.detection = Detection(
@@ -59,24 +59,10 @@ class PiperPoseDetection(Node):
         # np_color_image = cv2.rotate(np_color_image, cv2.ROTATE_180)
         # np_depth_image = cv2.rotate(np_depth_image, cv2.ROTATE_180)
         # mask = cv2.rotate(mask.astype(np.uint8), cv2.ROTATE_180)
-        # mask[:, 400:] = False
-        # # 定义深度图的尺寸
-        # height, width = np_depth_image.shape[:2]
 
-        # # 定义高斯分布参数
-        # A = 255  # 振幅（峰值）
-        # x0, y0 = width // 2, height // 2  # 高斯分布的中心
-        # sigma_x, sigma_y = 100, 100  # 标准差，控制钟形曲线的宽度
-
-        # # 创建二维网格
-        # x = np.arange(0, width)
-        # y = np.arange(0, height)
-        # X, Y = np.meshgrid(x, y)
-
-        # # 计算二维高斯分布
-        # np_depth_image = A * np.exp(
-        #     -((X - x0) ** 2 / (2 * sigma_x**2) + (Y - y0) ** 2 / (2 * sigma_y**2))
-        # )
+        # true_indices = np.argwhere(~mask)
+        # rows, cols = true_indices[np.random.choice(len(true_indices), 100000, False)].T
+        # np_depth_image[rows, cols] = np_depth_image.max() * 1.5
         if self.save_as_file:
             # now = datetime.now().strftime("%Y%m%d_%H%M%S")
             now = 0  # For testing purposes, use a fixed timestamp
@@ -111,15 +97,16 @@ class PiperPoseDetection(Node):
                 intrinsic=intrinsic,
                 workspace_mask=mask,
             )
-            if gg is not None and len(gg) != 0:
-                # 非极大值抑制
-                gg.nms(translation_thresh=0.1, rotation_thresh=45 * np.pi / 180.0)
-                gg.sort_by_score()
-                grasp = gg[0]
-                print(grasp)
-                self.piper_pose_detection_pub.publish(
-                    PiperPoseDetection.grasp2msg(grasp, ros_rgb_image.header.stamp)
-                )
+            if gg is not None:
+                if len(gg) != 0:
+                    # 非极大值抑制
+                    gg.nms(translation_thresh=0.1, rotation_thresh=45 * np.pi / 180.0)
+                    gg.sort_by_score()
+                    grasp = gg[0]
+                    # print(grasp)
+                    self.piper_pose_detection_pub.publish(
+                        PiperPoseDetection.grasp2msg(grasp, ros_rgb_image.header.stamp)
+                    )
                 self.detection.draw_grasps(
                     gg[:1], cloud, gg_path, np_depth_image.shape[:2]
                 )
