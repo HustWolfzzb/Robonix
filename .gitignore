@@ -16,3 +16,6 @@ log.txt
 
 .DS_Store
 .env
+
+# ignore the api-key and other sensitive information
+brain/.env
