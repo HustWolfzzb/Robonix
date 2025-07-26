@@ -16,9 +16,13 @@ temp/
 log.txt
 
 .DS_Store
+<<<<<<< HEAD
 .env
 
 # ignore the api-key and other sensitive information
 brain/.env
 =======
 >>>>>>> parent of 059e076 (Standardized the content in files and delete the test files)
+=======
+.env
+>>>>>>> parent of 56a5f36 (ignore the api-key file change)
