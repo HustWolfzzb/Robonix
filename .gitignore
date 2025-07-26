@@ -11,3 +11,5 @@ install/
 temp/
 .vscode/
 
+# ignore the api-key and other sensitive information
+brain/.env
