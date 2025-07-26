@@ -11,5 +11,8 @@ install/
 temp/
 .vscode/
 
-# ignore the api-key and other sensitive information
-brain/.env
+#log
+log.txt
+
+.DS_Store
+.env
