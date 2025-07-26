@@ -11,7 +11,7 @@ capability:
   - navigation2
   - activator
 skill:
-  - moveit
+  - move
   - test_skill
 brain:
   - test_brian
