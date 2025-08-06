@@ -26,7 +26,7 @@ class AmclPoseGetter(Node):
         self.get_logger().info("Got AMCL pose.")
         self.destroy_subscription(self.subscription)
 
-@eaios.api
+@eaios.cap
 def get_pose(timeout_sec=2.0):
     """获取当前机器人位姿信息
     Args:

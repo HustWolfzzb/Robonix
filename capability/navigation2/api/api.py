@@ -62,7 +62,7 @@ class NavWithUltrasonicSafety(Node):
             self.navigator.cancelTask()
             self.cancelled = True
 
-@eaios.api
+@eaios.cap
 def nv_test():
     import time
     if int(time.time())%2 == 0:
@@ -74,7 +74,7 @@ def nv_test():
     # return res
     return func()
 
-@eaios.api
+@eaios.cap
 def set_goal(x, y, yaw) -> str:
     """设置导航目标点
     Args:
@@ -97,7 +97,7 @@ def set_goal(x, y, yaw) -> str:
     func_status = f"Service set_gaol response: {res}"
     return func_status
 
-@eaios.api
+@eaios.cap
 def stop_goal() -> str:
     """停止当前导航目标
     Args:

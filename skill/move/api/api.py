@@ -22,8 +22,7 @@ from DeepEmbody.manager.eaios_decorators import eaios
 #TODO memory
 mamory = {}
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def move_to_goal(goal_name:str) -> str:
     """通过预存名称移动到指定位置
     Args:
@@ -37,8 +36,7 @@ def move_to_goal(goal_name:str) -> str:
         return f"Service setmove_to_goal_gaol response: {False}, message: goal not in memory"
 
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def move_to_ab_pos(x, y, yaw) -> str:
     """移动到绝对坐标位置
     Args:
@@ -51,8 +49,7 @@ def move_to_ab_pos(x, y, yaw) -> str:
     #TODO how read dep
     return set_goal(x,y,yaw)
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def move_to_rel_pos(dx,dy,dyaw) -> str:
     """相对当前位置移动指定偏移量
     Args:

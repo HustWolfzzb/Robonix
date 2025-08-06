@@ -42,7 +42,7 @@ def _get_eaios_decorator():
 eaios = _get_eaios_decorator()
 
 
-@eaios.api
+@eaios.cap
 def cap_camera_rgb(camera_name="robot_camera", timeout_sec=5.0):
     """
     Get the color image (OpenCV format) from the simulator camera using driver functions.
@@ -70,7 +70,7 @@ def cap_camera_rgb(camera_name="robot_camera", timeout_sec=5.0):
         return None
 
 
-@eaios.api
+@eaios.cap
 def cap_camera_dep_rgb(camera_name="robot_camera", timeout_sec=5.0):
     """
     Get the RGB and depth images (with the same timestamp) from the simulator camera using driver functions.
@@ -98,7 +98,7 @@ def cap_camera_dep_rgb(camera_name="robot_camera", timeout_sec=5.0):
         return None, None
 
 
-@eaios.api
+@eaios.cap
 def cap_camera_info(camera_name="robot_camera", timeout_sec=5.0) -> dict:
     """
     Get parameter matrix for the simulator camera.
@@ -135,7 +135,7 @@ def cap_camera_info(camera_name="robot_camera", timeout_sec=5.0) -> dict:
         return None
 
 
-@eaios.api
+@eaios.cap
 def cap_save_rgb_image(filename, camera_name="robot_camera", width=None, height=None):
     """
     Capture and save RGB image from simulator camera to file using driver functions.
@@ -157,7 +157,7 @@ def cap_save_rgb_image(filename, camera_name="robot_camera", width=None, height=
         return {"success": False}
 
 
-@eaios.api
+@eaios.cap
 def cap_save_depth_image(filename, camera_name="robot_camera", width=None, height=None):
     """
     Capture and save depth image from simulator camera to file using driver functions.
@@ -179,7 +179,7 @@ def cap_save_depth_image(filename, camera_name="robot_camera", width=None, heigh
         return {"success": False}
 
 
-@eaios.api
+@eaios.cap
 def cap_get_robot_pose(timeout_sec=5.0):
     """
     Get the current pose of the robot in the simulator using driver functions.
@@ -206,7 +206,7 @@ def cap_get_robot_pose(timeout_sec=5.0):
         return None
 
 
-@eaios.api
+@eaios.cap
 def cap_calculate_object_global_position(
     pixel_x: float, 
     pixel_y: float, 

@@ -2,8 +2,7 @@ from typing import Dict, Tuple, Optional
 from DeepEmbody.manager.eaios_decorators import eaios
 from .map import semantic_map
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_update_map(camera_name: str) -> bool:
     """
     当前视角下,识别所有物体,加入语义地图
@@ -36,8 +35,7 @@ def skl_update_map(camera_name: str) -> bool:
         print(f"Error in skl_update_map: {e}")
         return False
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_query_map_all() -> Dict[str, Tuple[float, float, float]]:
     """
     查询语义地图所有物体
@@ -54,8 +52,7 @@ def skl_query_map_all() -> Dict[str, Tuple[float, float, float]]:
         print(f"Error in skl_query_map_all: {e}")
         return {}
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_query_map(obj_name: str) -> Optional[Tuple[float, float, float]]:
     """
     查询语义地图指定物体
@@ -78,8 +75,7 @@ def skl_query_map(obj_name: str) -> Optional[Tuple[float, float, float]]:
         print(f"Error in skl_query_map: {e}")
         return None
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_add_map_obj(obj_name: str, coordinates: Tuple[float, float, float]) -> bool:
     """
     手动向语义地图中增加物体

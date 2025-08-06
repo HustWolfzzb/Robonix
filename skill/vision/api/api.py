@@ -5,8 +5,7 @@ import traceback
 import os
 from .vision import px2xy, remove_mask_outliers, get_mask_center_opencv
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_detect_objs(camera_name: str) -> dict:
     """
     Detect all objects in the current view of the specified camera and return their categories and coordinates (in the 'map' frame).

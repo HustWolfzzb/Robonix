@@ -20,8 +20,7 @@ from DeepEmbody.manager.eaios_decorators import eaios
 #TODO memory
 mamory = {}
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def test_nv():
     # res = nv_test()
     # print("lhe debug in skill test nv res",res)

@@ -47,7 +47,7 @@ def configure_api_module(dir_path):
     
     print(f"Configuring API for '{name}' with plugin: {plugin}")
     
-    # 3. 找到api.py中被@eaios.api修饰的函数
+    # 3. 找到api.py中被@eaios.cap修饰的函数
     api_path = dir_path / "api" / "api.py"
     if not api_path.exists():
         raise FileNotFoundError(f"api.py not found at {api_path}")
@@ -63,7 +63,7 @@ def configure_api_module(dir_path):
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             for decorator in node.decorator_list:
-                # 检查装饰器是否是@eaios.api
+                # 检查装饰器是否是@eaios.cap
                 if (isinstance(decorator, ast.Attribute) and 
                     decorator.attr == 'api' and 
                     isinstance(decorator.value, ast.Name) and 
@@ -71,7 +71,7 @@ def configure_api_module(dir_path):
                     decorated_functions.append(node.name)
     
     if not decorated_functions:
-        print("Warning: No functions decorated with @eaios.api found in api.py")
+        print("Warning: No functions decorated with @eaios.cap found in api.py")
 
     print("decorated_functions",decorated_functions)
     

@@ -70,8 +70,7 @@ def put_text_with_background(
     cv2.putText(img, text, (x, y), font, font_scale, text_color, thickness)
 
 
-@eaios.api
-@eaios.caller
+@eaios.skill
 def skl_detect_objs(camera_name: str) -> dict:
     # this is used for simulation environment
     try:

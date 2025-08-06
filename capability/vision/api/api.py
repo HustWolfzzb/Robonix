@@ -7,7 +7,7 @@ from tf2_geometry_msgs import do_transform_point
 from geometry_msgs.msg import PointStamped
 import numpy as np
 
-@eaios.api
+@eaios.cap
 def cap_camera_rgb(camera_name, timeout_sec=5.0):
     """
     Get the color image (OpenCV format) from the specified camera.
@@ -28,7 +28,7 @@ def cap_camera_rgb(camera_name, timeout_sec=5.0):
     node.destroy_node()
     return result
 
-@eaios.api
+@eaios.cap
 def cap_camera_dep_rgb(camera_name, timeout_sec=5.0):
     """
     Get the RGB and depth images (with the same timestamp) from the specified camera.
@@ -50,7 +50,7 @@ def cap_camera_dep_rgb(camera_name, timeout_sec=5.0):
     node.destroy_node()
     return result
 
-@eaios.api
+@eaios.cap
 def cap_camera_info(camera_name, timeout_sec=5.0) -> dict:
     """
     Get parameter matrix for the specified camera.
@@ -80,7 +80,7 @@ def cap_camera_info(camera_name, timeout_sec=5.0) -> dict:
     node.destroy_node()
     return result
 
-@eaios.api
+@eaios.cap
 def cap_tf_transform(source_frame, target_frame, x, y, z, timeout_sec=10.0) -> tuple:
     """
     In a ROS environment, perform coordinate system transformation, converting the coordinates under source_frame in the input parameters to coordinates under target_frame.
