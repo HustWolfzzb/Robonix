@@ -1,9 +1,6 @@
 [submodule "driver/realsense_ros2/src/realsense-ros"]
 	path = driver/realsense_ros2/src/realsense-ros
 	url = https://github.com/IntelRealSense/realsense-ros.git
-[submodule "driver/orbbec/src/OrbbecSDK_ROS2"]
-	path = driver/orbbec/src/OrbbecSDK_ROS2
-	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
 [submodule "capability/grasp_detection/src/graspnetAPI"]
 	path = capability/grasp_detection/src/graspnetAPI
 	url = https://github.com/graspnet/graspnetAPI.git
@@ -14,3 +11,6 @@
 	path = driver/agilex_piper/src/piper_ros
 	url = https://github.com/agilexrobotics/piper_ros.git
 	branch = humble
+[submodule "driver/orbbec_depth_camera/src/OrbbecSDK_ROS2"]
+	path = driver/orbbec_depth_camera/src/OrbbecSDK_ROS2
+	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
