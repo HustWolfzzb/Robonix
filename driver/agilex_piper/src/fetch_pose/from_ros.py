@@ -36,6 +36,7 @@ class FetchPoseFromROS(Node):
             msg.pose.position.y,
             msg.pose.position.z,
         ]
+        # roll, pitch, yaw in degrees
         self.target_euler = R.from_quat(
             [
                 msg.pose.orientation.x,
@@ -43,7 +44,7 @@ class FetchPoseFromROS(Node):
                 msg.pose.orientation.z,
                 msg.pose.orientation.w,
             ]
-        ).as_euler("zyx", degrees=True)
+        ).as_euler("xyz", degrees=True)
         with self.lock:
             self.callback(self.target_position, self.target_euler, msg.header.stamp)
 
