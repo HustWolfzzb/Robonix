@@ -5,4 +5,4 @@
 #  [-1,0,0]
 #  [0,-1,0]]
 # 四元数：0.5 -0.5 0.5 -0.5
-ros2 run tf2_ros static_transform_publisher 0.0 0.0 0.2 0.5 -0.5 0.5 -0.5 base_link camera_color_optical_frame
+ros2 run tf2_ros static_transform_publisher -0.05 0.0 0.1 0.5 -0.5 0.5 -0.5 base_link camera_color_optical_frame
