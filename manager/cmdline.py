@@ -7,6 +7,7 @@ import os
 import atexit
 from typing import List, Dict, Any, Optional, Callable
 import traceback
+import aioconsole
 
 class Colors:
     RED = "\033[91m"
@@ -296,12 +297,12 @@ class CLI:
         """Get ROS info"""
         return (
             "ROS_DISTRO: "
-            + os.getenv("ROS_DISTRO")
+            + (os.getenv("ROS_DISTRO") or "N/A")
             + ", ROS_VERSION: "
-            + os.getenv("ROS_VERSION")
+            + (os.getenv("ROS_VERSION") or "N/A")
         )
 
-    def run(self):
+    async def run(self):
         """Run command line interface"""
         print_cyan(
             "Welcome to DeepEmbody Shell (system time: "
@@ -351,7 +352,7 @@ class CLI:
             try:
                 prompt = get_prompt()
                 try:
-                    line = input(prompt)
+                    line = await aioconsole.ainput(prompt)
                 except (EOFError, KeyboardInterrupt):
                     print_red("\nExiting...")
                     break

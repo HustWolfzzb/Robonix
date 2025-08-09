@@ -62,8 +62,17 @@ class NavWithUltrasonicSafety(Node):
             self.navigator.cancelTask()
             self.cancelled = True
 
-rclpy.init()
-nv_controller = NavWithUltrasonicSafety()
+@eaios.api
+def nv_test():
+    import time
+    if int(time.time())%2 == 0:
+        func = eaios.get_plugin("navigation2","ros2_navigation")
+    else:
+        func = eaios.get_plugin("navigation2","simple_navigation")
+    # res = func()
+    print("lhe debug in cap test nv res", func, id(func))
+    # return res
+    return func()
 
 @eaios.api
 def set_goal(x, y, yaw) -> str:
@@ -74,9 +83,18 @@ def set_goal(x, y, yaw) -> str:
         yaw: 目标点偏航角
     """
     # rclpy.init()
-    res = nv_controller.set_goal(x,y,yaw)
+    import yaml
+    plugin_name = "simple_navigation"
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "description.yml")
+    with open(config_path, "r") as f:
+        description_data = yaml.safe_load(f)
+        plugin_name = description_data.get("plugins", [])[0]  # 获取第一个插件名称
+    if plugin_name == "ros2_navigation":
+        func = eaios.get_plugin("navigation2","ros2_navigation")
+    else:
+        func = eaios.get_plugin("navigation2","simple_navigation")
+    res = func(x,y,yaw)
     func_status = f"Service set_gaol response: {res}"
-    rclpy.shutdown()
     return func_status
 
 @eaios.api
