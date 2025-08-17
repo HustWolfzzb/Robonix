@@ -10,7 +10,7 @@ import inspect
 if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from constant import BASE_SKILL_PATH, BASE_PATH, BASE_BRAIN_PATH, BRAIN_INIT_FILE, SKILL_INIT_FILE
-
+from log import logger
 if os.path.dirname(BASE_PATH) not in sys.path:
     sys.path.append(os.path.dirname(BASE_PATH))
 
@@ -85,6 +85,43 @@ class FunctionRegistry:
     @staticmethod
     def gen_lens():
         return len(sys._eaios_function_registry['registered_funcs'])
+
+# 缓存已导入的技能模块
+_skill_module_cache = None
+
+def get_skill_module():
+    """获取技能模块（延迟导入+缓存）"""
+    global _skill_module_cache
+    if _skill_module_cache is None:
+        try:
+            # 延迟导入技能模块
+            _skill_module_cache = importlib.import_module("DeepEmbody.skill")
+            logger.info(f"成功导入技能模块: {_skill_module_cache.__file__}")
+        except ImportError as e:
+            logger.error(f"导入技能模块失败: {e}")
+            _skill_module_cache = None
+    return _skill_module_cache
+
+def inject_skill_functions(func):
+    """将技能函数注入到目标函数的全局作用域"""
+    skill_module = get_skill_module()
+    if not skill_module:
+        logger.warning("无法注入技能函数 - 技能模块未加载")
+        return func
+    # 获取目标函数的全局作用域
+    globals_dict = func.__globals__
+    
+    # 注入所有公开函数
+    for name in getattr(skill_module, "__all__", []):
+        try:
+            # 只在函数不存在时注入
+            if name not in globals_dict:
+                globals_dict[name] = getattr(skill_module, name)
+                logger.debug(f"注入技能函数: {name}")
+        except AttributeError as e:
+            logger.warning(f"无法注入函数 {name}: {e}")
+    
+    return func
 
 
 class eaios:
@@ -167,7 +204,7 @@ class eaios:
                         rel_path = os.path.relpath(full_path, base_dir)  # e.g., 'x/y/z.py'
                         module_parts = rel_path[:-3].replace(os.sep, ".")  # remove .py
                         module_path = f"{base_package}.{module_parts}"
-                        print(module_path)
+                        print("[DEBUG] scan_dir: ",module_path)
 
                         try:
                             importlib.import_module(module_path)
@@ -198,53 +235,42 @@ class eaios:
     @staticmethod
     def skill(func):
         """
-        skill装饰器： 把自己列入skill以及brain的__init__中 从 __init__.py 中动态导入所有 __all__ 中列出的函数
+        skill装饰器：注册函数并注入技能模块功能
+        1. 在导入时向注册表注册信息
+        2. 在调用时从技能模块导入函数
+        3. 避免循环导入
         """
-
+        # 第一步：注册函数（在导入时执行）
+        full_mod = func.__module__
+        logger.info(f"注册函数: {func.__name__} from {full_mod}")
+        
+        # 使用注册表注册函数
+        registry = FunctionRegistry()
+        registry.add_function(func.__name__, full_mod)
+        
+        # 第二步：包装函数（延迟技能注入）
+        @eaios.mcp.tool()  # 应用MCP装饰器
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
-            #     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-            print("[DEBUG] __file__:", __file__)
-            print("[DEBUG] cwd:", os.getcwd())
-            print("[DEBUG] sys.path:",sys.path)
-            skill_module = importlib.import_module("DeepEmbody.skill")  # 必须是模块路径
-            print(id(skill_module),skill_module.__file__)
-            print(eaios.FUNCTION_REGISTRY)
-            for name in getattr(skill_module, "__all__", []):
-                func.__globals__[name] = getattr(skill_module, name)
-            print("eaios.__module__ =", eaios.__module__)
-            print("eaios class id =", id(eaios))
-            func = eaios.mcp.tool()(func)
-
-            full_mod = func.__module__
-            print("full mod",full_mod)
-            # print(f"[DEBUG] API 开始: _registered_funcs = {_registered_funcs}, ID={id(_registered_funcs)}")
-            registry = FunctionRegistry()
-            registry.add_function(func.__name__, full_mod)
+            # 在首次调用时注入技能函数
+            nonlocal func
+            if not hasattr(wrapper, '_injected'):
+                logger.debug(f"首次调用 {func.__name__}, 注入技能函数")
+                func = inject_skill_functions(func)
+                wrapper._injected = True
+            
+            # 执行原始函数
             return func(*args, **kwargs)
-
+        
         return wrapper
-        # @functools.wraps(func)
-        # def wrapper(*args, **kwargs):
-        #     with open(INIT_FILE, 'r') as f:
-        #         for line in f:
-        #             if line.startswith('from'):
-        #                 parts = line.strip().split()
-        #                 if len(parts) == 4 and parts[0] == 'from' and parts[2] == 'import':
-        #                     rel_module = parts[1].lstrip('.')
-        #                     full_module = f"base_path.skill.{rel_module}"
-        #                     func_name = parts[3]
-        #                     imported = getattr(importlib.import_module(full_module), func_name)
-        #                     func.__globals__[func_name] = imported
-        #     return func(*args, **kwargs)
-        # return wrapper
 def package_init(config_path: str):
     """
     初始化包，扫描 config_path 中的所有模块并注册。
     """
-    if os.path.exists(INIT_FILE):
-        os.remove(INIT_FILE)
+    if os.path.exists(BRAIN_INIT_FILE):
+        os.remove(BRAIN_INIT_FILE)
+    if os.path.exists(SKILL_INIT_FILE):
+        os.remove(SKILL_INIT_FILE)
     config_path = os.path.join(BASE_PATH, config_path)
     if not os.path.exists(config_path):
         print(f"[eaios] Error: The configuration file '{config_path}' does not exist.")

@@ -230,10 +230,15 @@ class MCPClient:
         """Clean up resources"""
         await self.exit_stack.aclose()
 
+@eaios.brain
+async def test_brain(client):
+    return await client.tool_session_map["test_nv"].call_tool("test_nv")
 async def main(): 
     client = MCPClient()
     try:
         await client.connect_to_server()
+        res = await test_brain(client)
+        print("test brain res",res.content)
         await client.chat_loop()
     finally:
         await client.cleanup()
