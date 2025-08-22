@@ -24,11 +24,11 @@ mamory = {}
 
 @eaios.skill
 def move_to_goal(goal_name:str) -> str:
-    """通过预存名称移动到指定位置
+    """move to a predefined goal position stored in memory
     Args:
-        goal_name: 预存位置点的名称
+        goal_name: the name of the goal to move to, which should be stored in memory
     Returns:
-        移动操作的结果状态字符串
+        A string indicating the result of the move operation
     """
     if goal_name in memory.keys():
         return move_to_ab_pos(memory[goal_name])
@@ -38,26 +38,26 @@ def move_to_goal(goal_name:str) -> str:
 
 @eaios.skill
 def move_to_ab_pos(x, y, yaw) -> str:
-    """移动到绝对坐标位置
+    """Move to an absolute position in the map
     Args:
-        x: 目标点X坐标
-        y: 目标点Y坐标
-        yaw: 目标点偏航角
+        x: x coordinate of the target point
+        y: y coordinate of the target point
+        yaw: yaw angle of the target point in radians
     Returns:
-        移动操作的结果状态字符串
+        A string indicating the result of the move operation
     """
     #TODO how read dep
     return set_goal(x,y,yaw)
 
 @eaios.skill
 def move_to_rel_pos(dx,dy,dyaw) -> str:
-    """相对当前位置移动指定偏移量
+    """Move to a relative position based on the current positions
     Args:
-        dx: X方向偏移量
-        dy: Y方向偏移量
-        dyaw: 偏航角偏移量
+        dx: x direction offset
+        dy: y direction offset
+        dyaw: yaw angle offset in radians
     Returns:
-        移动操作的结果状态字符串
+        A string indicating the result of the move operation
     """
     set_goal = dep["move"][1]["set_goal"]
     pos = get_pos()
@@ -86,7 +86,6 @@ def test():
     node.destroy_node()
     rclpy.shutdown()
     
-#315曹老师办公室 28.3 0.1 0
+#315 pos 28.3 0.1 0
 if __name__ == "__main__":
-    # 初始化并运行 server
     move_to_ab_pos(-11.7,-6.8,0)

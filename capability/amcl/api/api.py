@@ -28,16 +28,16 @@ class AmclPoseGetter(Node):
 
 @eaios.cap
 def get_pose(timeout_sec=2.0):
-    """获取当前机器人位姿信息
+    """get the current AMCL pose
     Args:
-        timeout_sec: 等待位姿数据的超时时间（秒），默认2.0秒
+        timeout_sec: timeout in seconds to wait for the pose
     Returns:
-        成功时返回(x, y, yaw)表示当前位置和朝向，超时返回None
+        A tuple of (x, y, yaw) if pose is received, otherwise None
     """
     rclpy.init()
     node = AmclPoseGetter()
 
-    # 等待 pose 被接收到
+    # Wait for the pose to be received or timeout
     end_time = node.get_clock().now().nanoseconds + int(timeout_sec * 1e9)
     while rclpy.ok() and node.pose is None and node.get_clock().now().nanoseconds < end_time:
         rclpy.spin_once(node, timeout_sec=0.1)

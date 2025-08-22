@@ -14,9 +14,9 @@ from log import logger
 if os.path.dirname(BASE_PATH) not in sys.path:
     sys.path.append(os.path.dirname(BASE_PATH))
 
-# 使用模块属性作为全局注册表
+# use a global variable to store registered functions
 if not hasattr(sys, '_eaios_function_registry'):
-    # 首次加载时初始化
+    # initialize the registry
     sys._eaios_function_registry = {
         'registered_funcs': []
     }
@@ -143,7 +143,7 @@ class eaios:
         # print(f"[DEBUG] API 开始: _registered_funcs = {_registered_funcs}, ID={id(_registered_funcs)}")
         registry = FunctionRegistry()
         registry.add_function(func.__name__, full_mod)
-        # print(f"[DEBUG] API 添加后: _registered_funcs = {_registered_funcs}, ID={id(_registered_funcs)}")
+        # print(f"[DEBUG] API after: _registered_funcs = {_registered_funcs}, ID={id(_registered_funcs)}")
         return func
 
     @staticmethod
@@ -178,9 +178,8 @@ class eaios:
     @staticmethod
     def scan_dir(base_package: str, base_dir: str):
         """
-        自动递归导入 base_dir 下所有api（api.py 文件），触发注册，再 finalize。
-        - base_package: 如 'test_api.cap.hello1.api'
-        - base_dir: 绝对路径，对应 base_package 的目录
+        import base_package recursively
+        e.g., base_package = "DeepEmbody.capability.plugins"
         """
         for root, dirs, files in os.walk(base_dir):
             if "__pycache__" in root: 
@@ -213,7 +212,7 @@ class eaios:
     @staticmethod
     def brain(func):
         """
-        装饰器：从 __init__.py 中动态导入所有 __all__ 中列出的函数
+        decorator, from brain's __init__ import all from brain module
         """
 
         @functools.wraps(func)
@@ -223,7 +222,7 @@ class eaios:
             print("[DEBUG] __file__:", __file__)
             print("[DEBUG] cwd:", os.getcwd())
             print("[DEBUG] sys.path:",sys.path)
-            brain_module = importlib.import_module("DeepEmbody.brain")  # 必须是模块路径
+            brain_module = importlib.import_module("DeepEmbody.brain")
             print(id(brain_module),brain_module.__file__)
             print(eaios.FUNCTION_REGISTRY)
             for name in getattr(brain_module, "__all__", []):
@@ -235,37 +234,40 @@ class eaios:
     @staticmethod
     def skill(func):
         """
-        skill装饰器：注册函数并注入技能模块功能
-        1. 在导入时向注册表注册信息
-        2. 在调用时从技能模块导入函数
-        3. 避免循环导入
+        decorator for skill functions
+        This decorator does three things:
+        1. register the function in the global registry
+        2. import the skill module from DeepEmbody.skill
+        3. avoid circular imports by using a wrapper function
         """
-        # 第一步：注册函数（在导入时执行）
+        # step1: register the function
         full_mod = func.__module__
-        logger.info(f"注册函数: {func.__name__} from {full_mod}")
+        logger.info(f"register: {func.__name__} from {full_mod}")
         
-        # 使用注册表注册函数
+        # step2: update the import and __all__ in skill_init.py
         registry = FunctionRegistry()
         registry.add_function(func.__name__, full_mod)
         
-        # 第二步：包装函数（延迟技能注入）
-        @eaios.mcp.tool()  # 应用MCP装饰器
+        # step3: inject skill functions into the function's global scope
+        @eaios.mcp.tool()  # apply MCP tool decorator
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # 在首次调用时注入技能函数
+            # aplly skill functions injection only once
             nonlocal func
             if not hasattr(wrapper, '_injected'):
-                logger.debug(f"首次调用 {func.__name__}, 注入技能函数")
+                logger.debug(f"register firstly {func.__name__}, injecting skill functions...")
                 func = inject_skill_functions(func)
                 wrapper._injected = True
             
-            # 执行原始函数
+            # call the original function
             return func(*args, **kwargs)
         
         return wrapper
 def package_init(config_path: str):
     """
-    初始化包，扫描 config_path 中的所有模块并注册。
+    Initialize the package by scanning directories and registering functions.
+    Args:
+        config_path: Path to the configuration YAML file.
     """
     if os.path.exists(BRAIN_INIT_FILE):
         os.remove(BRAIN_INIT_FILE)
@@ -327,24 +329,9 @@ class NodeController(Node):
 print(id(eaios.mcp))
 print("eaios.__module__ =", eaios.__module__)
 print("eaios class id =", id(eaios))
-@eaios.mcp.tool()
-def api_change_hello(name: str) -> str:
-    """修改hello的对象
-    Args:
-        name: 新的hello名称
-    """
-    # rclpy.init()
-    # node = NodeController()
-    # req = Trigger.Request()
-    # res = node.call_service('modify_name', req)
-    # func_status = f"Service modify_name response: {res.success}, message: {res.message}"
-    # node.destroy_node()
-    # rclpy.shutdown()
-    # return func_status
-    return ""
 
 async def mcp_start():
-    """异步启动MCP服务器"""
+    """start mcp server in asyncio loop"""
     loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, eaios.mcp.run, "sse")
 

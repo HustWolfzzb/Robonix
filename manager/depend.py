@@ -34,9 +34,7 @@ def scan_dir(base_path, feature_set, feature_sources, all_dependencies):
 
 def check_depend(config_path):
     """
-    遍历 cap/ 和 skill/ 所有子目录中的 description.yml 文件，收集 feature 和 dependency。
-    - 检查重复 feature
-    - 检查 dependency 是否在 feature 列表中
+    Check dependencies in the given configuration file.
     """
 
     feature_set = set()
@@ -49,7 +47,7 @@ def check_depend(config_path):
     with open(config_path, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
     all_base_details = []
-    # Step 1: 扫描所有目录，获取 feature 和 dependency
+    # Step 1:check if the 'base' directory exists and scan it
     for base,entrys in config.items():
         base_dir_path = os.path.join(BASE_PATH, base)
         if not os.path.exists(base_dir_path):
@@ -67,7 +65,7 @@ def check_depend(config_path):
         except Exception as e:
             print(f"[ERROR] An error occurred while accessing '{base_dir_path}': {e}")
             return []
-    # Step 2: 检查所有依赖是否存在于 feature_set 中
+    # Step 2: check if the 'include' directory exists and scan it
     all_valid = True
     for entry_path, deps in all_dependencies.items():
         for dep in deps:

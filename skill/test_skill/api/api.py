@@ -27,7 +27,6 @@ def test_nv():
     # return res
     return nv_test()
 
-#315曹老师办公室 28.3 0.1 0
+#315pos 28.3 0.1 0
 if __name__ == "__main__":
-    # 初始化并运行 server
    test_nv()

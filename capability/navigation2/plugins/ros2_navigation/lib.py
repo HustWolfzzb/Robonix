@@ -17,11 +17,7 @@ class NavWithUltrasonicSafety(Node):
         self.safety_threshold = safety_threshold
         self.cancelled = False
 
-        # 订阅超声波测距话题
         self.create_subscription(Range, '/ultrasonic/sensor0_front', self.range_callback, 10)
-
-        # # 发送目标
-        # self.send_goal(x, y, yaw)
 
     def set_goal(self, x, y, yaw):
         goal_pose = PoseStamped()

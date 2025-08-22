@@ -52,9 +52,9 @@ def tool_calls_format(tool_calls_str: str):
     tools_split = tool_calls_str.split("\n")
     for i in tools_split:
         if "[FC]" in i:
-            # 提取函数名称  [Funcall]:map_create();
+            # func name  [Funcall]:map_create();
             funcName = i.split(":")[1].split("(")[0].strip()
-            # 提取参数
+            # args
             args_str = i.split("(")[1].split(")")[0].strip()
             args_dict = {}
             if args_str:
@@ -145,7 +145,7 @@ class MCPClient:
             }
         ]
 
-        # Initial Claude API call - 本demo中替换成deepseek
+        # Initial Claude API call - replace it into deepseek while in local test
         start_time = time.time()
         response = self.client.chat.completions.create(
             model="deepseek-chat",
@@ -214,7 +214,6 @@ class MCPClient:
         while True:
             try:
                 query = input("\nQuery: ").strip()
-                # query = "告诉我你现在可以调用哪些函数"
 
                 if query.lower() == 'quit':
                     break
@@ -242,7 +241,7 @@ async def main():
         await client.chat_loop()
     finally:
         await client.cleanup()
-# 自动售货机 -11.7 -6.8 0
+# automat -11.7 -6.8 0
 if __name__ == "__main__":
     import sys
     asyncio.run(main())

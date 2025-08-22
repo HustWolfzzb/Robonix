@@ -19,11 +19,9 @@ class NavWithUltrasonicSafety(Node):
         self.safety_threshold = safety_threshold
         self.cancelled = False
 
-        # 订阅超声波测距话题
+        # create subscription to ultrasonic sensor
         self.create_subscription(Range, '/ultrasonic/sensor0_front', self.range_callback, 10)
 
-        # # 发送目标
-        # self.send_goal(x, y, yaw)
 
     def set_goal(self, x, y, yaw):
         goal_pose = PoseStamped()
@@ -37,7 +35,7 @@ class NavWithUltrasonicSafety(Node):
         self.get_logger().info('Going to goal pose...')
         self.navigator.goThroughPoses([goal_pose])
 
-        # 监控导航和传感器
+        # monitor the task
         while not self.navigator.isTaskComplete() and not self.cancelled:
             rclpy.spin_once(self, timeout_sec=0.5)
 
@@ -76,11 +74,11 @@ def nv_test():
 
 @eaios.cap
 def set_goal(x, y, yaw) -> str:
-    """设置导航目标点
+    """set navigation goal
     Args:
-        x: 目标点X坐标
-        y: 目标点Y坐标
-        yaw: 目标点偏航角
+        x: x coordinate of the target point
+        y: y coordinate of the target point
+        yaw: yaw angle of the target point in radians
     """
     # rclpy.init()
     import yaml
@@ -99,7 +97,7 @@ def set_goal(x, y, yaw) -> str:
 
 @eaios.cap
 def stop_goal() -> str:
-    """停止当前导航目标
+    """Stop the current navigation goal.
     Args:
         None
     """
@@ -134,5 +132,4 @@ def test():
 
 
 if __name__ == "__main__":
-    # 初始化并运行 server
     mcp.run(transport='stdio')

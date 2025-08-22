@@ -102,13 +102,13 @@ async def main():
         cli = CLI(manager)
         input_task = asyncio.create_task(cli.run())
         
-        # 等待任意任务完成
+        # wait for either mcp or input task to complete
         done, pending = await asyncio.wait(
             [mcp_task, input_task],
             return_when=asyncio.FIRST_COMPLETED
         )
 
-        # 取消所有仍在运行的任务
+        # cancel any remaining tasks
         for task in pending:
             task.cancel()
             try:
@@ -136,14 +136,13 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    # Unix-like系统的信号处理
+    # Unix-like systems can handle signals
     for signame in ('SIGINT', 'SIGTERM'):
         try:
             loop.add_signal_handler(
                 getattr(signal, signame),
                 lambda: asyncio.create_task(shutdown(signame)))
         except NotImplementedError:
-            # 如果平台不支持信号处理，使用备选方案
             pass
 
     try:
@@ -151,6 +150,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt, shutting down...")
     finally:
-        # 清理资源
+        # Ensure all tasks are cancelled and resources are cleaned up
         loop.run_until_complete(loop.shutdown_asyncgens())
         loop.close()
